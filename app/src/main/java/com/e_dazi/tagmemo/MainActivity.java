@@ -12,7 +12,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity
@@ -111,6 +115,7 @@ public class MainActivity extends ActionBarActivity
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private ArrayAdapter<String> mAdapter;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -137,9 +142,19 @@ public class MainActivity extends ActionBarActivity
             // テキストビューのテキストを設定します
             Bundle args = getArguments();
             int tagId = args.getInt(ARG_SECTION_NUMBER);
-            textView.setText("テスト"+tagId);
+            textView.setText("テキスト"+tagId);
 
             //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+
+            // ListViewに表示するデータを作成する TODO:
+            ArrayList<String> list = new ArrayList<>();
+            for (int i = 0; i < 20; i++) {
+                list.add("hoge" + i);
+            }
+
+            ListView listView = (ListView) rootView.findViewById(R.id.item_listview);
+            mAdapter = new ItemListAdapter(getActivity(), list);
+            listView.setAdapter(mAdapter);
 
             return rootView;
         }
