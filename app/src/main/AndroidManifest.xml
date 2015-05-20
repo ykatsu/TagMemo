@@ -3,16 +3,29 @@
     package="com.e_dazi.tagmemo" >
 
     <application
+        android:name="com.e_dazi.tagmemo.MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="TagMemo.db" />
+
+        <meta-data
+            android:name="AA_MODELS"
+            android:value="com.e_dazi.tagmemo.Item, com.e_dazi.tagmemo.Memo, com.e_dazi.tagmemo.Tag" />
+
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="4" />
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -16,6 +16,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
+
 import java.util.ArrayList;
 
 
@@ -146,10 +148,22 @@ public class MainActivity extends ActionBarActivity
 
             //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
 
-            // ListViewに表示するデータを作成する TODO:
+            // ListViewに表示するデータを作成する
+            // TODO: タグに対応させる
+
+//            new Delete().from(Memo.class).execute();
+
+            // タグ指定無しの場合は、全Memoデータを表示する
+            ArrayList<Memo> listLemo = new ArrayList<>(
+                new Select()
+                    .from(Memo.class)
+                    .orderBy("updated_at DESC")
+                    .<Memo>execute()
+            );
+
             ArrayList<String> list = new ArrayList<>();
-            for (int i = 0; i < 20; i++) {
-                list.add("hoge" + i);
+            for (Memo memo: listLemo) {
+                list.add (memo.title);
             }
 
             ListView listView = (ListView) rootView.findViewById(R.id.item_listview);
