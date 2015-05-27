@@ -14,11 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class MainActivity extends ActionBarActivity
@@ -54,22 +54,13 @@ public class MainActivity extends ActionBarActivity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, PlaceholderFragment.newInstance(position))
                 .commit();
     }
 
     public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
-        }
+        ArrayList<Tag> tagl = ((MainApplication) getApplication()).getDrawerTagList();
+        mTitle = tagl.get(number).name;
     }
 
     public void restoreActionBar() {
@@ -138,33 +129,50 @@ public class MainActivity extends ActionBarActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-            TextView textView = (TextView)rootView.findViewById(R.id.section_label);
+//            TextView textView = (TextView)rootView.findViewById(R.id.section_label);
 
             // テキストビューのテキストを設定します
             Bundle args = getArguments();
-            int tagId = args.getInt(ARG_SECTION_NUMBER);
-            textView.setText("テキスト"+tagId);
+            int tagPos = args.getInt(ARG_SECTION_NUMBER);
+            ArrayList<Tag> tagl = ((MainApplication) this.getActivity().getApplication()).getDrawerTagList();
+            Tag tag = tagl.get(tagPos);
+            String tagStr = tag.name;
+            long tagId = tag.getId();
+
+            //textView.setText("テキスト：" + tagStr);
 
             //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
 
             // ListViewに表示するデータを作成する
-            // TODO: タグに対応させる
-
-//            new Delete().from(Memo.class).execute();
-
             // タグ指定無しの場合は、全Memoデータを表示する
-            ArrayList<Memo> listLemo = new ArrayList<>(
+//            if (false) {
+//                ArrayList<Memo> listMemo = new ArrayList<>(
+//                    new Select()
+//                        .from(Memo.class)
+//                        .orderBy("updated_at DESC")
+//                        .<Memo>execute()
+//                );
+//            }
+
+            ArrayList<Item> listItem = new ArrayList<>(
                 new Select()
-                    .from(Memo.class)
-                    .orderBy("updated_at DESC")
-                    .<Memo>execute()
+                    .from(Item.class)
+                    .where("Tag = ?", tagId)
+                    //.orderBy("updated_at DESC")
+                    .<Item>execute()
             );
 
+            // sort by memo.update_at DESC
+            Collections.sort(listItem, new ItemComparator());
+
+
             ArrayList<String> list = new ArrayList<>();
-            for (Memo memo: listLemo) {
-                list.add (memo.title);
+            for (Item item: listItem) {
+                list.add(item.memo.title);
             }
+//            for ( memo: listItem) {
+//                list.add (memo.title);
+//            }
 
             ListView listView = (ListView) rootView.findViewById(R.id.item_listview);
             mAdapter = new ItemListAdapter(getActivity(), list);
@@ -180,5 +188,4 @@ public class MainActivity extends ActionBarActivity
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }
-
 }

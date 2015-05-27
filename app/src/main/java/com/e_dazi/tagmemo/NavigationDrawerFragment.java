@@ -22,6 +22,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
@@ -91,19 +96,31 @@ public class NavigationDrawerFragment extends Fragment {
                              Bundle savedInstanceState) {
         mDrawerListView = (ListView) inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
+
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull AdapterView<?> parent, @NonNull View view, int position, long id) {
                 selectItem(position);
             }
         });
+
+        // Set tag text list to drawer
+        ArrayList<Tag> listTag = new ArrayList<>(
+            new Select()
+                .from(Tag.class)
+                .orderBy("id")
+                .<Tag>execute()
+        );
+        ((MainApplication)this.getActivity().getApplication()).setDrawerTagList(listTag);
+
+        List<String> list = new ArrayList<>();
+        for (Tag tag: listTag) {
+            list.add(tag.name);
+        }
+
         mDrawerListView.setAdapter(new TagListItemAdapter(
                 getActionBar().getThemedContext(),
-                new String[]{
-                    "Sec1",
-                    "Sec2",
-                    "Sec3",
-        }));
+                list));
 
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
@@ -272,7 +289,7 @@ public class NavigationDrawerFragment extends Fragment {
     /**
      * Callbacks interface that all activities using this fragment must implement.
      */
-    public static interface NavigationDrawerCallbacks {
+    public interface NavigationDrawerCallbacks {
         /**
          * Called when an item in the navigation drawer is selected.
          */

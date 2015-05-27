@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Adapter for Drawer ListView.
  *
@@ -17,7 +19,7 @@ public class TagListItemAdapter extends ArrayAdapter<String> {
 
     private LayoutInflater mLayoutInflater;
 
-    public TagListItemAdapter(Context context, String[] objects) {
+    public TagListItemAdapter(Context context, List<String> objects) {
         // 第2引数はtextViewResourceIdとされていますが、カスタムリストアイテムを使用する場合は特に意識する必要のない引数です
         super(context, 0, objects);
         // レイアウト生成に使用するインフレーター
@@ -43,7 +45,7 @@ public class TagListItemAdapter extends ArrayAdapter<String> {
 
         // 各Viewに表示する情報を設定
         TextView text1 = (TextView) view.findViewById(android.R.id.text1);
-        text1.setText("Tag" + item);
+        text1.setText(item);
 
         return view;
     }

@@ -5,9 +5,10 @@ import android.util.Log;
 import com.activeandroid.query.Delete;
 
 import java.sql.Date;
+import java.util.ArrayList;
 
 /**
- * For ActiveAndroid
+ * Main Application
  *
  * Created by yoshi on 2015/05/08.
  */
@@ -15,6 +16,7 @@ import java.sql.Date;
 public class MainApplication extends com.activeandroid.app.Application {
 
     private final String TAG = "MainApplication";
+    private ArrayList<Tag> gDrawerTagList;
 
     @Override
     public void onCreate() {
@@ -22,6 +24,7 @@ public class MainApplication extends com.activeandroid.app.Application {
 
         Log.v(TAG, "--- onCreate() in ---");
 
+        gDrawerTagList = null;
         InitDB();
     }
 
@@ -51,10 +54,12 @@ public class MainApplication extends com.activeandroid.app.Application {
         memo2.save();
         Memo memo3 = new Memo("テストタイトル3", "テスト本文3");
         memo3.save();
+        Memo memo13 = new Memo("テストタイトル13", "テスト本文13");
+        memo13.save();
 
-        Tag tag = new Tag();
-        tag.name = "タグ１";
-        tag.save();
+        Tag tag1 = new Tag();
+        tag1.name = "タグ１";
+        tag1.save();
 
         Tag tag2 = new Tag("タグ２");
         tag2.save();
@@ -63,13 +68,17 @@ public class MainApplication extends com.activeandroid.app.Application {
 
         Item item = new Item();
         item.memo = memo;
-        item.tag  = tag;
+        item.tag  = tag1;
         item.save();
 
         Item item2 = new Item(memo2, tag2);
         item2.save();
         Item item3 = new Item(memo3, tag3);
         item3.save();
+        Item item131 = new Item(memo13, tag1);
+        item131.save();
+        Item item133 = new Item(memo13, tag3);
+        item133.save();
     }
 
 //    @Override
@@ -77,4 +86,12 @@ public class MainApplication extends com.activeandroid.app.Application {
 //        super.onTerminate();
 //        ActiveAndroid.dispose();
 //    }
+
+    public ArrayList<Tag> getDrawerTagList() {
+        return this.gDrawerTagList;
+    }
+
+    public void setDrawerTagList(ArrayList<Tag> list) {
+        this.gDrawerTagList = list;
+    }
 }
