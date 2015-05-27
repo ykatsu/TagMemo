@@ -11,4 +11,9 @@
     <string name="action_example">Example action</string>
 
     <string name="action_settings">Settings</string>
+    <string name="title_activity_memo">MemoActivity</string>
+
+    <string name="memo_hint">メモを入力してください</string>
+    <string name="buttonCancel">キャンセル</string>
+    <string name="buttonSave">保存</string>
 </resources>

@@ -1,7 +1,9 @@
 package com.e_dazi.tagmemo;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -12,7 +14,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.activeandroid.query.Select;
@@ -108,6 +112,8 @@ public class MainActivity extends ActionBarActivity
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private static final int REQUEST_REGMEMO_ACTIVITY = 1;
+
         private ArrayAdapter<String> mAdapter;
 
         /**
@@ -131,7 +137,6 @@ public class MainActivity extends ActionBarActivity
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 //            TextView textView = (TextView)rootView.findViewById(R.id.section_label);
 
-            // テキストビューのテキストを設定します
             Bundle args = getArguments();
             int tagPos = args.getInt(ARG_SECTION_NUMBER);
             ArrayList<Tag> tagl = ((MainApplication) this.getActivity().getApplication()).getDrawerTagList();
@@ -140,19 +145,7 @@ public class MainActivity extends ActionBarActivity
             long tagId = tag.getId();
 
             //textView.setText("テキスト：" + tagStr);
-
             //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-
-            // ListViewに表示するデータを作成する
-            // タグ指定無しの場合は、全Memoデータを表示する
-//            if (false) {
-//                ArrayList<Memo> listMemo = new ArrayList<>(
-//                    new Select()
-//                        .from(Memo.class)
-//                        .orderBy("updated_at DESC")
-//                        .<Memo>execute()
-//                );
-//            }
 
             ArrayList<Item> listItem = new ArrayList<>(
                 new Select()
@@ -165,20 +158,47 @@ public class MainActivity extends ActionBarActivity
             // sort by memo.update_at DESC
             Collections.sort(listItem, new ItemComparator());
 
-
             ArrayList<String> list = new ArrayList<>();
             for (Item item: listItem) {
                 list.add(item.memo.title);
             }
-//            for ( memo: listItem) {
-//                list.add (memo.title);
-//            }
 
             ListView listView = (ListView) rootView.findViewById(R.id.item_listview);
             mAdapter = new ItemListAdapter(getActivity(), list);
             listView.setAdapter(mAdapter);
 
+            // リストをタップした時の動作を定義する
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(@NonNull AdapterView<?> parent, @NonNull View view, int position, long id) {
+                    // Adapterからタップした位置のデータを取得する
+                    String str = (String) parent.getItemAtPosition(position);
+                    //Toast.makeText(mActivity, str, Toast.LENGTH_SHORT).show();
+                    gotoMemoActivity(str);
+                }
+            });
+
+            // 追加ボタンの動作を定義する
+            Button headerButton = (Button)rootView.findViewById(R.id.item_add_button);
+            headerButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(@NonNull View v) {
+                    registerMemo();
+                }
+            });
             return rootView;
+        }
+
+        private void gotoMemoActivity(String str) {
+            Intent intent = new Intent( getActivity(), MemoActivity.class );
+            intent.putExtra( "INTENT_PARAM", str );
+            startActivity( intent );
+        }
+
+        private void registerMemo() {
+            // TODO: RegisterMemoActivity 作成
+//            Intent intent = new Intent( this, RegisterMemoActivity.class);
+//            startActivityForResult(intent, REQUEST_REGMEMO_ACTIVITY);
         }
 
         @Override
