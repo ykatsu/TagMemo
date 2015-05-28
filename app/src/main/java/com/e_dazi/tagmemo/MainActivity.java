@@ -112,9 +112,12 @@ public class MainActivity extends ActionBarActivity
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
-        private static final int REQUEST_REGMEMO_ACTIVITY = 1;
+//        private static final int REQUEST_REGMEMO_ACTIVITY = 1;
+//        private static final int REQUEST_EDITMEMO_ACTIVITY = 2;
 
         private ArrayAdapter<String> mAdapter;
+        private Tag mTag;
+        private ArrayList<Item> mListItem;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -132,6 +135,13 @@ public class MainActivity extends ActionBarActivity
         }
 
         @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            ((MainActivity) activity).onSectionAttached(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
+        }
+
+        @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -140,41 +150,24 @@ public class MainActivity extends ActionBarActivity
             Bundle args = getArguments();
             int tagPos = args.getInt(ARG_SECTION_NUMBER);
             ArrayList<Tag> tagl = ((MainApplication) this.getActivity().getApplication()).getDrawerTagList();
-            Tag tag = tagl.get(tagPos);
-            String tagStr = tag.name;
-            long tagId = tag.getId();
+            mTag = tagl.get(tagPos);
+            String tagStr = mTag.name;
+            long tagId = mTag.getId();
 
             //textView.setText("テキスト：" + tagStr);
             //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
 
-            ArrayList<Item> listItem = new ArrayList<>(
-                new Select()
-                    .from(Item.class)
-                    .where("Tag = ?", tagId)
-                    //.orderBy("updated_at DESC")
-                    .<Item>execute()
-            );
-
-            // sort by memo.update_at DESC
-            Collections.sort(listItem, new ItemComparator());
-
-            ArrayList<String> list = new ArrayList<>();
-            for (Item item: listItem) {
-                list.add(item.memo.title);
-            }
-
-            ListView listView = (ListView) rootView.findViewById(R.id.item_listview);
-            mAdapter = new ItemListAdapter(getActivity(), list);
-            listView.setAdapter(mAdapter);
+            ListView listView = getListView(rootView, tagId);
 
             // リストをタップした時の動作を定義する
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(@NonNull AdapterView<?> parent, @NonNull View view, int position, long id) {
                     // Adapterからタップした位置のデータを取得する
-                    String str = (String) parent.getItemAtPosition(position);
+                    //String title = (String) parent.getItemAtPosition(position);
                     //Toast.makeText(mActivity, str, Toast.LENGTH_SHORT).show();
-                    gotoMemoActivity(str);
+
+                    gotoMemoActivity(mListItem.get(position).memo.getId());
                 }
             });
 
@@ -189,10 +182,35 @@ public class MainActivity extends ActionBarActivity
             return rootView;
         }
 
-        private void gotoMemoActivity(String str) {
+        private ListView getListView(View rootView, long tagId) {
+            mListItem = new ArrayList<>(
+                new Select()
+                    .from(Item.class)
+                    .where("Tag = ?", tagId)
+                    //.orderBy("updated_at DESC")
+                    .<Item>execute()
+            );
+
+            // sort by memo.update_at DESC
+            Collections.sort(mListItem, new ItemComparator());
+
+            ArrayList<String> list = new ArrayList<>();
+            for (Item item: mListItem) {
+                list.add(item.memo.title);
+            }
+
+            ListView listView = (ListView) rootView.findViewById(R.id.item_listview);
+            mAdapter = new ItemListAdapter(getActivity(), list);
+            listView.setAdapter(mAdapter);
+            return listView;
+        }
+
+        private void gotoMemoActivity(long memoId) {
             Intent intent = new Intent( getActivity(), MemoActivity.class );
-            intent.putExtra( "INTENT_PARAM", str );
-            startActivity( intent );
+//            intent.putExtra(getString(R.string.param_title), title);
+            intent.putExtra(getString(R.string.param_memo_id), memoId);
+            startActivity(intent);
+//            startActivityForResult(intent, REQUEST_EDITMEMO_ACTIVITY);
         }
 
         private void registerMemo() {
@@ -201,11 +219,28 @@ public class MainActivity extends ActionBarActivity
 //            startActivityForResult(intent, REQUEST_REGMEMO_ACTIVITY);
         }
 
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
+//        @Override
+//        public void onActivityResult(int requestCode, int resultCode,
+//                                     Intent data) {
+//            super.onActivityResult(requestCode, resultCode, data);
+//
+//            switch (requestCode) {
+//                // Memo regist からの戻り値取得
+//                case REQUEST_REGMEMO_ACTIVITY:
+//                    if (Activity.RESULT_OK == resultCode) {
+//                        String title = data.getStringExtra(getString(R.string.key_title));
+////                        mAdapter.insert(title, 0);
+//                    }
+//                    break;
+//
+//                // Memo Edit からの戻り値取得
+//                case REQUEST_EDITMEMO_ACTIVITY:
+//                    if (Activity.RESULT_OK == resultCode) {
+//                        String title = data.getStringExtra(getString(R.string.key_title));
+//
+//                    }
+//                    break;
+//            }
+//        }
     }
 }

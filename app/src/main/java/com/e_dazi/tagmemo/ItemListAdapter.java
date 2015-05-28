@@ -12,10 +12,19 @@ import java.util.List;
 
 /**
  * Adapter for Main Item ListView
+ * メモのリスト表示用のアダプタで、メモのタイトル文字列Arrayを保持している
  *
  * Created by yoshi on 2015/05/08.
  */
 public class ItemListAdapter extends ArrayAdapter<String> {
+
+    private static class ViewHolder {
+        TextView mainText;
+
+        public ViewHolder(View view) {
+            this.mainText = (TextView) view.findViewById(R.id.main_text);
+        }
+    }
 
     private LayoutInflater mLayoutInflater;
 
@@ -27,30 +36,23 @@ public class ItemListAdapter extends ArrayAdapter<String> {
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
-        View view;
+        ViewHolder holder;
 
         // ListViewに表示する分のレイアウトが生成されていない場合レイアウトを作成する
         if (convertView == null) {
             // レイアウトファイルからViewを生成する
-            view = mLayoutInflater.inflate(R.layout.list_item, parent, false);
+            convertView = mLayoutInflater.inflate(R.layout.list_item, parent, false);
+            holder = new ViewHolder(convertView);
+            convertView.setTag(holder);
         } else {
-            // レイアウトが存在する場合は再利用する
-            view = convertView;
+            holder = (ViewHolder) convertView.getTag();
         }
 
         // リストアイテムに対応するデータを取得する
         String item = getItem(position);
+        holder.mainText.setText(item);
 
-        TextView mainText = (TextView) view.findViewById(R.id.main_text);
-        mainText.setText(item);
-
-        // 各Viewに表示する情報を設定
-//        TextView text1 = (TextView) view.findViewById(R.id.TitleText);
-//        text1.setText("Title:" + item);
-//        TextView text2 = (TextView) view.findViewById(R.id.SubTitleText);
-//        text2.setText("SubTitle:" + item);
-
-        return view;
+        return convertView;
     }
 
 }

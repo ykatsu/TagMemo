@@ -19,7 +19,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="追加"
+        android:text="@string/item_add"
         android:id="@+id/item_add_button"
         android:layout_gravity="center_horizontal"
         android:layout_alignParentBottom="true"/>

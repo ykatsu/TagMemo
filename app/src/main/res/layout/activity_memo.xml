@@ -19,7 +19,7 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/Eidt_comment"
+        android:id="@+id/memo_text"
         android:layout_below="@+id/memo_title"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"

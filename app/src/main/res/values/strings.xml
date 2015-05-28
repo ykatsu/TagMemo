@@ -16,4 +16,7 @@
     <string name="memo_hint">メモを入力してください</string>
     <string name="buttonCancel">キャンセル</string>
     <string name="buttonSave">保存</string>
+    <string name="param.title">title</string>
+    <string name="item_add">追加</string>
+    <string name="param.memo_id">memo_id</string>
 </resources>
