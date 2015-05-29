@@ -112,12 +112,13 @@ public class MainActivity extends ActionBarActivity
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
-//        private static final int REQUEST_REGMEMO_ACTIVITY = 1;
-//        private static final int REQUEST_EDITMEMO_ACTIVITY = 2;
+        private static final int REQUEST_ADDMEMO_ACTIVITY = 1;
+        private static final int REQUEST_EDITMEMO_ACTIVITY = 2;
 
         private ArrayAdapter<String> mAdapter;
         private Tag mTag;
         private ArrayList<Item> mListItem;
+        private ArrayList<String> mListItemTitle;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -167,80 +168,83 @@ public class MainActivity extends ActionBarActivity
                     //String title = (String) parent.getItemAtPosition(position);
                     //Toast.makeText(mActivity, str, Toast.LENGTH_SHORT).show();
 
-                    gotoMemoActivity(mListItem.get(position).memo.getId());
+                    editMemoActivity(mListItem.get(position).memo.getId());
                 }
             });
 
             // 追加ボタンの動作を定義する
-            Button headerButton = (Button)rootView.findViewById(R.id.item_add_button);
+            Button headerButton = (Button) rootView.findViewById(R.id.item_add_button);
             headerButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(@NonNull View v) {
-                    registerMemo();
+                    addMemoActivity(mTag.getId());
                 }
             });
+
             return rootView;
         }
 
         private ListView getListView(View rootView, long tagId) {
+            loadListItem(tagId);
+
+            mAdapter = new ItemListAdapter(getActivity(), mListItemTitle);
+            ListView listView = (ListView) rootView.findViewById(R.id.item_listview);
+            listView.setAdapter(mAdapter);
+            return listView;
+        }
+
+        private void loadListItem(long tagId) {
             mListItem = new ArrayList<>(
-                new Select()
-                    .from(Item.class)
-                    .where("Tag = ?", tagId)
-                    //.orderBy("updated_at DESC")
-                    .<Item>execute()
+                    new Select()
+                            .from(Item.class)
+                            .where("Tag = ?", tagId)
+                                    //.orderBy("updated_at DESC")
+                            .<Item>execute()
             );
 
             // sort by memo.update_at DESC
             Collections.sort(mListItem, new ItemComparator());
 
-            ArrayList<String> list = new ArrayList<>();
-            for (Item item: mListItem) {
-                list.add(item.memo.title);
+            mListItemTitle = new ArrayList<>();
+            for (Item item : mListItem) {
+                mListItemTitle.add(item.memo.title);
             }
-
-            ListView listView = (ListView) rootView.findViewById(R.id.item_listview);
-            mAdapter = new ItemListAdapter(getActivity(), list);
-            listView.setAdapter(mAdapter);
-            return listView;
         }
 
-        private void gotoMemoActivity(long memoId) {
-            Intent intent = new Intent( getActivity(), MemoActivity.class );
-//            intent.putExtra(getString(R.string.param_title), title);
+        private void editMemoActivity(long memoId) {
+            Intent intent = new Intent(getActivity(), MemoActivity.class);
             intent.putExtra(getString(R.string.param_memo_id), memoId);
-            startActivity(intent);
-//            startActivityForResult(intent, REQUEST_EDITMEMO_ACTIVITY);
+//            startActivity(intent);
+            startActivityForResult(intent, REQUEST_EDITMEMO_ACTIVITY);
         }
 
-        private void registerMemo() {
-            // TODO: RegisterMemoActivity 作成
-//            Intent intent = new Intent( this, RegisterMemoActivity.class);
-//            startActivityForResult(intent, REQUEST_REGMEMO_ACTIVITY);
+        private void addMemoActivity(long tagId) {
+            Intent intent = new Intent(getActivity(), MemoActivity.class);
+            intent.putExtra(getString(R.string.param_memo_id),
+                    (long) getResources().getInteger(R.integer.memo_id_none));
+            intent.putExtra(getString(R.string.param_tag_id), tagId);
+//            startActivity(intent);
+            startActivityForResult(intent, REQUEST_ADDMEMO_ACTIVITY);
         }
 
-//        @Override
-//        public void onActivityResult(int requestCode, int resultCode,
-//                                     Intent data) {
-//            super.onActivityResult(requestCode, resultCode, data);
-//
-//            switch (requestCode) {
-//                // Memo regist からの戻り値取得
-//                case REQUEST_REGMEMO_ACTIVITY:
-//                    if (Activity.RESULT_OK == resultCode) {
+        @Override
+        public void onActivityResult(int requestCode, int resultCode,
+                                     Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+
+            switch (requestCode) {
+                // Memo add からの戻り値取得
+                case REQUEST_ADDMEMO_ACTIVITY:
+                    // Memo Edit からの戻り値取得
+                case REQUEST_EDITMEMO_ACTIVITY:
+                    if (Activity.RESULT_OK == resultCode) {
 //                        String title = data.getStringExtra(getString(R.string.key_title));
-////                        mAdapter.insert(title, 0);
-//                    }
-//                    break;
-//
-//                // Memo Edit からの戻り値取得
-//                case REQUEST_EDITMEMO_ACTIVITY:
-//                    if (Activity.RESULT_OK == resultCode) {
-//                        String title = data.getStringExtra(getString(R.string.key_title));
-//
-//                    }
-//                    break;
-//            }
-//        }
+                        loadListItem(mTag.getId());
+                        mAdapter.clear();
+                        mAdapter.addAll(mListItemTitle);
+                    }
+                    break;
+            }
+        }
     }
 }

@@ -111,6 +111,7 @@ public class NavigationDrawerFragment extends Fragment {
                 .orderBy("id")
                 .<Tag>execute()
         );
+        // 取得したTagのリストをApplicationへ保存
         ((MainApplication)this.getActivity().getApplication()).setDrawerTagList(listTag);
 
         List<String> list = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.e_dazi.tagmemo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
@@ -8,86 +9,111 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.activeandroid.query.Select;
+
+import java.sql.Date;
+import java.util.ArrayList;
 
 
 public class MemoActivity extends ActionBarActivity {
 
     private Memo mMemo;
 
+    private EditText mEtTitle;
+    private EditText mEtText;
+    private Button mCanButton;
+    private Button mSaveButton;
+
+    private boolean mIsAddMode;
+    private long mOrgMemoId;
+    private ArrayList<Long> mTagIdList;
+    private long mOrgTagId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo);
 
-        setTitle("MemoActivityタイトル");
+        // TODO:完成したら画面タイトルを消す
+        setTitle("Memo編集画面");
 
         if(( savedInstanceState == null ) || ( savedInstanceState.isEmpty()) ) {
             // インテントから追加データを取り出す
-            long memoId = getIntent().getExtras().getLong(getString(R.string.param_memo_id));
-            mMemo = new Select()
-                    .from(Memo.class)
-                    .where("id = ?", memoId)
-                    .executeSingle();
+            mOrgTagId = getIntent().getExtras().getLong(getString(R.string.param_tag_id));
+            mOrgMemoId = getIntent().getExtras().getLong(getString(R.string.param_memo_id));
+
+            if (mOrgMemoId == (long)getResources().getInteger(R.integer.memo_id_none)) {
+                // 追加処理の場合
+                mIsAddMode = true;
+                mMemo = new Memo("", "");
+            } else {
+                // 編集処理の場合
+                mIsAddMode = false;
+                mMemo = new Select()
+                        .from(Memo.class)
+                        .where("id = ?", mOrgMemoId)
+                        .executeSingle();
+            }
+
+            mEtTitle = (EditText)findViewById(R.id.memo_title);
+            mEtText = (EditText)findViewById(R.id.memo_text);
+            mCanButton = (Button)findViewById(R.id.btnCancel);
+            mSaveButton = (Button)findViewById(R.id.btnSave);
         }
 
-        EditText etTitle = (EditText)findViewById(R.id.memo_title);
-        etTitle.setText(mMemo.title);
-
-        EditText etText = (EditText)findViewById(R.id.memo_text);
-        etText.setText(mMemo.text);
+        mEtTitle.setText(mMemo.title);
+        mEtText.setText(mMemo.text);
 
         // ボタンの動作を定義する
         // キャンセルボタン
-        Button canButton = (Button)findViewById(R.id.btnCancel);
-        canButton.setOnClickListener(new View.OnClickListener() {
+        mCanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(@NonNull View v) {
-//                Intent data = new Intent();
-//                setResult(RESULT_CANCELED, data);
-                finish();
+            Intent data = new Intent();
+            setResult(RESULT_CANCELED, data);
+            finish();
             }
         });
 
         // 保存ボタン
-        Button saveButton = (Button)findViewById(R.id.btnSave);
-        saveButton.setOnClickListener(new View.OnClickListener() {
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(@NonNull View v) {
+                onClickSaveButtonListener();
 
-                TextView memoTitle = (TextView)findViewById(R.id.memo_title);
-                String title = memoTitle.getText().toString();
-
-                EditText memoText = (EditText)findViewById(R.id.memo_text);
-                String text = memoText.getText().toString();
-
-                //Log.v("Save!", "title:"+title+" text:"+text);
-
-                // データ保存処理
-                if (mMemo == null) {
-                    mMemo = new Memo(title, text);
-                    mMemo.save();
-                    // TODO: Item, Tagの作成処理
-                } else {
-                    mMemo.title = title;
-                    mMemo.text = text;
-                    //mMemo.updated_at = new Date(System.currentTimeMillis());
-                    mMemo.save();
-                }
-
-                // 返すデータ(Intent&Bundle)の作成
-//                Intent data = new Intent();
-//                Bundle bundle = new Bundle();
-//                bundle.putString(getString(R.string.param_title), "タイトルダミー");
-//                data.putExtras(bundle);
-//                setResult(RESULT_OK, data);
-
-                finish();
             }
         });
 
+    }
+
+    private void onClickSaveButtonListener() {
+        //Log.v("Save!", "title:"+title+" text:"+text);
+        // データ保存処理
+        mMemo.title = mEtTitle.getText().toString();
+        mMemo.text = mEtText.getText().toString();
+        mMemo.updated_at = new Date(System.currentTimeMillis());
+        mMemo.save();
+
+        // TODO: Tagの作成処理が入ったら、正しいものを設定する
+        if (mIsAddMode) {
+            // この画面に来た時のタグ
+            Tag tag = new Select()
+                    .from(Tag.class)
+                    .where("id = ?", mOrgTagId)
+                    .executeSingle();
+
+            Item item = new Item(mMemo, tag);
+            item.save();
+        }
+
+        // 返すデータ(Intent&Bundle)の作成
+        Intent data = new Intent();
+//        Bundle bundle = new Bundle();
+//        bundle.putString(getString(R.string.param_title), mMemo.title);
+//        data.putExtras(bundle);
+        setResult(RESULT_OK, data);
+        finish();
     }
 
     @Override

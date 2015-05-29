@@ -19,4 +19,5 @@
     <string name="param.title">title</string>
     <string name="item_add">追加</string>
     <string name="param.memo_id">memo_id</string>
+    <string name="param.tag_id">tag_id</string>
 </resources>
