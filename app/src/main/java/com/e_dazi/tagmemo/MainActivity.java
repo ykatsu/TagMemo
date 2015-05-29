@@ -115,10 +115,9 @@ public class MainActivity extends ActionBarActivity
         private static final int REQUEST_ADDMEMO_ACTIVITY = 1;
         private static final int REQUEST_EDITMEMO_ACTIVITY = 2;
 
-        private ArrayAdapter<String> mAdapter;
+        private ArrayAdapter<Item> mAdapter;
         private Tag mTag;
         private ArrayList<Item> mListItem;
-        private ArrayList<String> mListItemTitle;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -187,7 +186,7 @@ public class MainActivity extends ActionBarActivity
         private ListView getListView(View rootView, long tagId) {
             loadListItem(tagId);
 
-            mAdapter = new ItemListAdapter(getActivity(), mListItemTitle);
+            mAdapter = new ItemListAdapter(getActivity(), mListItem);
             ListView listView = (ListView) rootView.findViewById(R.id.item_listview);
             listView.setAdapter(mAdapter);
             return listView;
@@ -204,11 +203,6 @@ public class MainActivity extends ActionBarActivity
 
             // sort by memo.update_at DESC
             Collections.sort(mListItem, new ItemComparator());
-
-            mListItemTitle = new ArrayList<>();
-            for (Item item : mListItem) {
-                mListItemTitle.add(item.memo.title);
-            }
         }
 
         private void editMemoActivity(long memoId) {
@@ -223,7 +217,6 @@ public class MainActivity extends ActionBarActivity
             intent.putExtra(getString(R.string.param_memo_id),
                     (long) getResources().getInteger(R.integer.memo_id_none));
             intent.putExtra(getString(R.string.param_tag_id), tagId);
-//            startActivity(intent);
             startActivityForResult(intent, REQUEST_ADDMEMO_ACTIVITY);
         }
 
@@ -241,7 +234,7 @@ public class MainActivity extends ActionBarActivity
 //                        String title = data.getStringExtra(getString(R.string.key_title));
                         loadListItem(mTag.getId());
                         mAdapter.clear();
-                        mAdapter.addAll(mListItemTitle);
+                        mAdapter.addAll(mListItem);
                     }
                     break;
             }

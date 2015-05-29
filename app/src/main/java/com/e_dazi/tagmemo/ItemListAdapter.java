@@ -16,7 +16,7 @@ import java.util.List;
  *
  * Created by yoshi on 2015/05/08.
  */
-public class ItemListAdapter extends ArrayAdapter<String> {
+public class ItemListAdapter extends ArrayAdapter<Item> {
 
     private static class ViewHolder {
         TextView mainText;
@@ -28,7 +28,7 @@ public class ItemListAdapter extends ArrayAdapter<String> {
 
     private LayoutInflater mLayoutInflater;
 
-    public ItemListAdapter(Context context, List<String> objects) {
+    public ItemListAdapter(Context context, List<Item> objects) {
         super(context, 0, objects);
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -49,8 +49,8 @@ public class ItemListAdapter extends ArrayAdapter<String> {
         }
 
         // リストアイテムに対応するデータを取得する
-        String item = getItem(position);
-        holder.mainText.setText(item);
+        Item item = getItem(position);
+        holder.mainText.setText(item.memo.title);
 
         return convertView;
     }
