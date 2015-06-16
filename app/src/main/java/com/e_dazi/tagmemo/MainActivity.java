@@ -62,7 +62,13 @@ public class MainActivity extends ActionBarActivity
                 .commit();
     }
 
+    /**
+     * ドロワーから選択された
+     *
+     * @param number selected position
+     */
     public void onSectionAttached(int number) {
+        // 選択位置のタグオブジェクトを取得し、タイトルに設定
         ArrayList<Tag> tagl = ((MainApplication) getApplication()).getDrawerTagList();
         mTitle = tagl.get(number).name;
     }
@@ -145,18 +151,20 @@ public class MainActivity extends ActionBarActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-//            TextView textView = (TextView)rootView.findViewById(R.id.section_label);
 
+            // グローバルに置いてあるタグリストから、パラ指定されたオブジェクトを取り出す。
             Bundle args = getArguments();
             int tagPos = args.getInt(ARG_SECTION_NUMBER);
             ArrayList<Tag> tagl = ((MainApplication) this.getActivity().getApplication()).getDrawerTagList();
             mTag = tagl.get(tagPos);
-            String tagStr = mTag.name;
             long tagId = mTag.getId();
 
-            //textView.setText("テキスト：" + tagStr);
-            //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+//            String tagStr = mTag.name;
+//            TextView textView = (TextView)rootView.findViewById(R.id.section_label);
+//            textView.setText("テキスト：" + tagStr);
+//            Toast.makeText(this, text, Toast.LENGTH_LONG).show();
 
+            // ListViewを作る
             ListView listView = getListView(rootView, tagId);
 
             // リストをタップした時の動作を定義する
@@ -183,6 +191,12 @@ public class MainActivity extends ActionBarActivity
             return rootView;
         }
 
+        /**
+         * Prepare ListView from tag ID.
+         * @param rootView root view
+         * @param tagId tagId of data to load.
+         * @return ListView Object.
+         */
         private ListView getListView(View rootView, long tagId) {
             loadListItem(tagId);
 
@@ -192,6 +206,10 @@ public class MainActivity extends ActionBarActivity
             return listView;
         }
 
+        /**
+         * Load and sort items from DB.
+         * @param tagId tagId of data to load.
+         */
         private void loadListItem(long tagId) {
             mListItem = new ArrayList<>(
                     new Select()
@@ -205,6 +223,10 @@ public class MainActivity extends ActionBarActivity
             Collections.sort(mListItem, new ItemComparator());
         }
 
+        /**
+         * メモ編集画面へ移動
+         * @param memoId memoId to edit.
+         */
         private void editMemoActivity(long memoId) {
             Intent intent = new Intent(getActivity(), MemoActivity.class);
             intent.putExtra(getString(R.string.param_memo_id), memoId);
@@ -212,6 +234,10 @@ public class MainActivity extends ActionBarActivity
             startActivityForResult(intent, REQUEST_EDITMEMO_ACTIVITY);
         }
 
+        /** 新規メモ追加画面へ移動
+         *
+         * @param tagId tagId of default tag of new memo.
+         */
         private void addMemoActivity(long tagId) {
             Intent intent = new Intent(getActivity(), MemoActivity.class);
             intent.putExtra(getString(R.string.param_memo_id),
@@ -220,6 +246,13 @@ public class MainActivity extends ActionBarActivity
             startActivityForResult(intent, REQUEST_ADDMEMO_ACTIVITY);
         }
 
+        /**
+         * メモ画面からの戻った時の処理
+         *
+         * @param requestCode requestCode
+         * @param resultCode resultCode
+         * @param data data
+         */
         @Override
         public void onActivityResult(int requestCode, int resultCode,
                                      Intent data) {
@@ -232,6 +265,7 @@ public class MainActivity extends ActionBarActivity
                 case REQUEST_EDITMEMO_ACTIVITY:
                     if (Activity.RESULT_OK == resultCode) {
 //                        String title = data.getStringExtra(getString(R.string.key_title));
+                        // リストをリロード
                         loadListItem(mTag.getId());
                         mAdapter.clear();
                         mAdapter.addAll(mListItem);
