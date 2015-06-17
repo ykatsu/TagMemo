@@ -273,8 +273,10 @@ public class MainActivity extends ActionBarActivity
                         mAdapter.clear();
                         mAdapter.addAll(mListItem);
 
-                        // タグのリストをリロード TODO: 必要な時だけリロードする様にする
-                        ((MainActivity)getActivity()).getNavigationDrawerFragment().getAdapter().refresh();
+                        // タグのリストをリロード
+                        if (data.getBooleanExtra(getString(R.string.param_doRefreshDrawer), true)) {
+                            ((MainActivity)getActivity()).getNavigationDrawerFragment().getAdapter().refresh();
+                        }
                     }
                     break;
             }

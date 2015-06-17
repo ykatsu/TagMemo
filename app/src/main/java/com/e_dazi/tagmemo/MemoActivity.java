@@ -144,8 +144,6 @@ public class MemoActivity extends ActionBarActivity {
     }
 
     private void onClickSaveButtonListener() {
-        //Log.v("Save!", "title:"+title+" text:"+text);
-
         // 各種データの作成＆削除を行う
         // TODO: トランザクション化の必要がある？
         // Memoデータを保存
@@ -192,7 +190,6 @@ public class MemoActivity extends ActionBarActivity {
                     }
                 }
 
-//                Log.v("Delete!", "Memo:" + mMemo.getId() + " tagId:" + tagId);
                 new Delete().from(Item.class).where("Memo = ? and Tag = ?", mMemo.getId(), tagId).execute();
             }
 
@@ -201,8 +198,9 @@ public class MemoActivity extends ActionBarActivity {
         }
 
         // Item, Tagデータの追加処理
+        boolean doRefrash = false;
         for (String tagName : incTagNameArr) {
-            // Tagレコードの存在を確認し、存在しなければ追加
+            // Tagレコードを取得し、存在しなければ新規に追加
             Tag tag = new Select()
                     .from(Tag.class)
                     .where("name = ?", tagName)
@@ -212,8 +210,8 @@ public class MemoActivity extends ActionBarActivity {
                 tag = new Tag(tagName);
                 tag.save();
 
-                // TODO: ドロワーへ、タグリスト変更を通知
-
+                // ドロワーへ、タグリスト変更を通知
+                doRefrash = true;
             }
 
             Item item = new Item(mMemo, tag);
@@ -224,9 +222,10 @@ public class MemoActivity extends ActionBarActivity {
 
         // 返すデータ(Intent&Bundle)の作成
         Intent data = new Intent();
-//        Bundle bundle = new Bundle();
+        Bundle bundle = new Bundle();
 //        bundle.putString(getString(R.string.param_title), mMemo.title);
-//        data.putExtras(bundle);
+        bundle.putBoolean(getString(R.string.param_doRefreshDrawer), doRefrash);
+        data.putExtras(bundle);
         setResult(RESULT_OK, data);
         finish();
     }

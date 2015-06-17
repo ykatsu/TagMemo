@@ -22,4 +22,5 @@
     <string name="param.memo_id">memo_id</string>
     <string name="param.tag_id">tag_id</string>
     <string name="memo_tag_hint">タグ スペース区切りで複数設定できます</string>
+    <string name="param.doRefreshDrawer">doRefreshDrawer</string>
 </resources>
