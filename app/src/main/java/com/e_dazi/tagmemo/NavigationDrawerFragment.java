@@ -22,10 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.activeandroid.query.Select;
-
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -62,6 +59,12 @@ public class NavigationDrawerFragment extends Fragment {
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+
+    private TagListItemAdapter mAdapter;
+
+    public TagListItemAdapter getAdapter() {
+        return mAdapter;
+    }
 
     public NavigationDrawerFragment() {
     }
@@ -104,24 +107,9 @@ public class NavigationDrawerFragment extends Fragment {
             }
         });
 
-        // Set tag text list to drawer
-        ArrayList<Tag> listTag = new ArrayList<>(
-            new Select()
-                .from(Tag.class)
-                .orderBy("id")
-                .<Tag>execute()
-        );
-        // 取得したTagのリストをApplicationへ保存
-        ((MainApplication)this.getActivity().getApplication()).setDrawerTagList(listTag);
-
-        List<String> list = new ArrayList<>();
-        for (Tag tag: listTag) {
-            list.add(tag.name);
-        }
-
-        mDrawerListView.setAdapter(new TagListItemAdapter(
-                getActionBar().getThemedContext(),
-                list));
+        mAdapter = new TagListItemAdapter(
+                getActionBar().getThemedContext(), new ArrayList<Tag>());
+        mDrawerListView.setAdapter(mAdapter);
 
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;

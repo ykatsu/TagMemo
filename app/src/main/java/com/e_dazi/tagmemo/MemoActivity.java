@@ -213,6 +213,7 @@ public class MemoActivity extends ActionBarActivity {
                 tag.save();
 
                 // TODO: ドロワーへ、タグリスト変更を通知
+
             }
 
             Item item = new Item(mMemo, tag);

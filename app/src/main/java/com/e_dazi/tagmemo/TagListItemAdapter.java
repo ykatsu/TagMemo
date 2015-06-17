@@ -8,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +18,7 @@ import java.util.List;
  *
  * Created by yoshi on 2015/04/21.
  */
-public class TagListItemAdapter extends ArrayAdapter<String> {
+public class TagListItemAdapter extends ArrayAdapter<Tag> {
 
     private static class ViewHolder {
         TextView tagText;
@@ -27,11 +30,14 @@ public class TagListItemAdapter extends ArrayAdapter<String> {
 
     private LayoutInflater mLayoutInflater;
 
-    public TagListItemAdapter(Context context, List<String> objects) {
+    public TagListItemAdapter(Context context, List<Tag> objects) {
         // 第2引数はtextViewResourceIdとされていますが、カスタムリストアイテムを使用する場合は特に意識する必要のない引数です
         super(context, 0, objects);
         // レイアウト生成に使用するインフレーター
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        // リストするデータをロード
+        refresh();
     }
 
     @Override
@@ -49,12 +55,27 @@ public class TagListItemAdapter extends ArrayAdapter<String> {
         }
 
         // リストアイテムに対応するデータを取得する
-        String item = getItem(position);
+        String item = getItem(position).name;
 
         // 各Viewに表示する情報を設定
         holder.tagText.setText(item);
 
         return convertView;
+    }
+
+    /**
+     * タグリストをDBから取得し直します
+     */
+    public void refresh() {
+        ArrayList<Tag> list = new ArrayList<>(
+                new Select()
+                        .from(Tag.class)
+                        .orderBy("id")
+                        .<Tag>execute()
+        );
+
+        clear();
+        addAll(list);
     }
 }
 

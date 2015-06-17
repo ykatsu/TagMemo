@@ -28,6 +28,10 @@ import java.util.Collections;
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    public NavigationDrawerFragment getNavigationDrawerFragment() {
+        return mNavigationDrawerFragment;
+    }
+
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -69,8 +73,8 @@ public class MainActivity extends ActionBarActivity
      */
     public void onSectionAttached(int number) {
         // 選択位置のタグオブジェクトを取得し、タイトルに設定
-        ArrayList<Tag> tagl = ((MainApplication) getApplication()).getDrawerTagList();
-        mTitle = tagl.get(number).name;
+        Tag tag = getNavigationDrawerFragment().getAdapter().getItem(number);
+        mTitle = tag.name;
     }
 
     public void restoreActionBar() {
@@ -155,8 +159,7 @@ public class MainActivity extends ActionBarActivity
             // グローバルに置いてあるタグリストから、パラ指定されたオブジェクトを取り出す。
             Bundle args = getArguments();
             int tagPos = args.getInt(ARG_SECTION_NUMBER);
-            ArrayList<Tag> tagl = ((MainApplication) this.getActivity().getApplication()).getDrawerTagList();
-            mTag = tagl.get(tagPos);
+            mTag = ((MainActivity) getActivity()).getNavigationDrawerFragment().getAdapter().getItem(tagPos);
             long tagId = mTag.getId();
 
 //            String tagStr = mTag.name;
@@ -269,6 +272,9 @@ public class MainActivity extends ActionBarActivity
                         loadListItem(mTag.getId());
                         mAdapter.clear();
                         mAdapter.addAll(mListItem);
+
+                        // タグのリストをリロード TODO: 必要な時だけリロードする様にする
+                        ((MainActivity)getActivity()).getNavigationDrawerFragment().getAdapter().refresh();
                     }
                     break;
             }

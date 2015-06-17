@@ -5,7 +5,6 @@ import android.util.Log;
 import com.activeandroid.query.Delete;
 
 import java.sql.Date;
-import java.util.ArrayList;
 
 /**
  * Main Application
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 public class MainApplication extends com.activeandroid.app.Application {
 
     private final String TAG = "MainApplication";
-    private ArrayList<Tag> gDrawerTagList;
 
     @Override
     public void onCreate() {
@@ -24,7 +22,6 @@ public class MainApplication extends com.activeandroid.app.Application {
 
         Log.v(TAG, "--- onCreate() in ---");
 
-        gDrawerTagList = null;
         InitDB();
     }
 
@@ -79,19 +76,5 @@ public class MainApplication extends com.activeandroid.app.Application {
         item131.save();
         Item item133 = new Item(memo13, tag3);
         item133.save();
-    }
-
-//    @Override
-//    public void onTerminate() {
-//        super.onTerminate();
-//        ActiveAndroid.dispose();
-//    }
-
-    public ArrayList<Tag> getDrawerTagList() {
-        return this.gDrawerTagList;
-    }
-
-    public void setDrawerTagList(ArrayList<Tag> list) {
-        this.gDrawerTagList = list;
     }
 }
