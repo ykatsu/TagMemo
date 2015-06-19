@@ -19,10 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.activeandroid.query.Select;
-
 import java.util.ArrayList;
-import java.util.Collections;
 
 
 public class MainActivity extends ActionBarActivity
@@ -127,7 +124,7 @@ public class MainActivity extends ActionBarActivity
 
         private ArrayAdapter<Item> mAdapter;
         private Tag mTag;
-        private ArrayList<Item> mListItem;
+//        private ArrayList<Item> mListItem;
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -178,7 +175,7 @@ public class MainActivity extends ActionBarActivity
                     //String title = (String) parent.getItemAtPosition(position);
                     //Toast.makeText(mActivity, str, Toast.LENGTH_SHORT).show();
 
-                    editMemoActivity(mListItem.get(position).memo.getId());
+                    editMemoActivity(mAdapter.getItem(position).memo.getId());
                 }
             });
 
@@ -201,29 +198,10 @@ public class MainActivity extends ActionBarActivity
          * @return ListView Object.
          */
         private ListView getListView(View rootView, long tagId) {
-            loadListItem(tagId);
-
-            mAdapter = new ItemListAdapter(getActivity(), mListItem);
+            mAdapter = new ItemListAdapter(getActivity(), new ArrayList<Item>(), tagId);
             ListView listView = (ListView) rootView.findViewById(R.id.item_listview);
             listView.setAdapter(mAdapter);
             return listView;
-        }
-
-        /**
-         * Load and sort items from DB.
-         * @param tagId tagId of data to load.
-         */
-        private void loadListItem(long tagId) {
-            mListItem = new ArrayList<>(
-                    new Select()
-                            .from(Item.class)
-                            .where("Tag = ?", tagId)
-                                    //.orderBy("updated_at DESC")
-                            .<Item>execute()
-            );
-
-            // sort by memo.update_at DESC
-            Collections.sort(mListItem, new ItemComparator());
         }
 
         /**
@@ -267,11 +245,10 @@ public class MainActivity extends ActionBarActivity
                     // Memo Edit からの戻り値取得
                 case REQUEST_EDITMEMO_ACTIVITY:
                     if (Activity.RESULT_OK == resultCode) {
+                        // 保存処理が実行された時の処理
 //                        String title = data.getStringExtra(getString(R.string.key_title));
-                        // リストをリロード
-                        loadListItem(mTag.getId());
-                        mAdapter.clear();
-                        mAdapter.addAll(mListItem);
+                        // メモリストをリロード
+                        ((ItemListAdapter)mAdapter).refresh(mTag.getId());
 
                         // タグのリストをリロード
                         if (data.getBooleanExtra(getString(R.string.param_doRefreshDrawer), true)) {

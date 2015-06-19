@@ -8,6 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,9 +32,11 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
 
     private LayoutInflater mLayoutInflater;
 
-    public ItemListAdapter(Context context, List<Item> objects) {
+    public ItemListAdapter(Context context, List<Item> objects, long tagId) {
         super(context, 0, objects);
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        refresh(tagId);
     }
 
     @Override
@@ -53,6 +59,26 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         holder.mainText.setText(item.memo.title);
 
         return convertView;
+    }
+
+    /**
+     * Load and sort items from DB.
+     * @param tagId tagId of data to load.
+     */
+    public void refresh(long tagId) {
+        ArrayList<Item> list = new ArrayList<>(
+                new Select()
+                        .from(Item.class)
+                        .where("Tag = ?", tagId)
+                                //.orderBy("updated_at DESC")
+                        .<Item>execute()
+        );
+
+        // sort by memo.update_at DESC
+        Collections.sort(list, new ItemComparator());
+
+        clear();
+        addAll(list);
     }
 
 }
