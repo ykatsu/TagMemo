@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.activeandroid.query.Select;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -36,6 +36,7 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
         super(context, 0, objects);
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        setNotifyOnChange(false);
         refresh(tagId);
     }
 
@@ -70,15 +71,23 @@ public class ItemListAdapter extends ArrayAdapter<Item> {
                 new Select()
                         .from(Item.class)
                         .where("Tag = ?", tagId)
-                                //.orderBy("updated_at DESC")
+                        //.orderBy("updated_at DESC")   // リレーション先なので入れられない
                         .<Item>execute()
         );
 
-        // sort by memo.update_at DESC
-        Collections.sort(list, new ItemComparator());
-
         clear();
         addAll(list);
+        sort(new ItemComparator());
+        notifyDataSetChanged();
     }
 
+    /**
+     * Comparator of this Adapter.
+     * sort by memo.update_at DESC
+     */
+    public class ItemComparator implements Comparator<Item> {
+        public int compare(@NonNull Item a, @NonNull Item b) {
+            return b.memo.updated_at.compareTo(a.memo.updated_at);
+        }
+    }
 }

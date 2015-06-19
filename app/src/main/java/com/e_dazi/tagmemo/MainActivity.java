@@ -248,7 +248,7 @@ public class MainActivity extends ActionBarActivity
                         // 保存処理が実行された時の処理
 //                        String title = data.getStringExtra(getString(R.string.key_title));
                         // メモリストをリロード
-                        ((ItemListAdapter)mAdapter).refresh(mTag.getId());
+                        ((ItemListAdapter) mAdapter).refresh(mTag.getId());
 
                         // タグのリストをリロード
                         if (data.getBooleanExtra(getString(R.string.param_doRefreshDrawer), true)) {
